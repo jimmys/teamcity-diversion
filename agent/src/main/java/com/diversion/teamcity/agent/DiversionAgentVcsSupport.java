@@ -79,8 +79,15 @@ public class DiversionAgentVcsSupport extends AgentVcsSupport implements UpdateB
         logger.message("Diversion: Checkout directory: " + checkoutDirectory.getAbsolutePath());
         logger.message("Diversion: Clean checkout: " + cleanCheckout);
 
-        File dvDir = new File(checkoutDirectory, ".dv");
-        boolean workspaceExists = dvDir.exists() && dvDir.isDirectory();
+        boolean workspaceExists = false;
+
+        for (String dvPath : Arrays.asList(".dv", ".diversion")) {
+            File dvDir = new File(checkoutDirectory, dvPath);
+            workspaceExists = dvDir.exists() && dvDir.isDirectory();
+            if (workspaceExists) {
+                break;
+            }
+        }
 
         if (cleanCheckout) {
             // Clean checkout explicitly requested

@@ -253,9 +253,10 @@ public class DiversionCommandExecutor {
             return false;
         }
 
-        // Check if .dv directory exists (workspace marker)
+        // Check if .dv or .diversion directory exists (workspace marker)
         File dvDir = new File(workingDirectory, ".dv");
-        return dvDir.exists() && dvDir.isDirectory();
+        File diversionDir = new File(workingDirectory, ".diversion");
+        return (dvDir.exists() && dvDir.isDirectory()) || (diversionDir.exists() && diversionDir.isDirectory());
     }
 
     /**

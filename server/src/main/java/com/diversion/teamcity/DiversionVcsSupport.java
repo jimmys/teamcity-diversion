@@ -143,8 +143,9 @@ public class DiversionVcsSupport extends ServerVcsSupport implements BuildPatchB
         if (files == null) return;
 
         for (File file : files) {
-            // Skip .dv directory
+            // Skip .dv and .diversion directory
             if (file.getName().equals(".dv")) continue;
+            if (file.getName().equals(".diversion")) continue;
 
             String filePath = relativePath.isEmpty() ? file.getName() : relativePath + "/" + file.getName();
 
