@@ -143,6 +143,10 @@ public class DiversionAgentVcsSupport extends AgentVcsSupport implements UpdateB
         runDvCommand(checkoutDirectory, logger,
             "checkout", toVersion, "--discard-changes");
 
+        // dv clone will exit while the repo is still syncing for a large repo. Block on dv status to finish
+        runDvCommand(checkoutDirectory, logger,
+            "status");
+
         logger.message("Diversion: Checkout completed successfully");
     }
 
@@ -207,8 +211,13 @@ public class DiversionAgentVcsSupport extends AgentVcsSupport implements UpdateB
 
             int exitCode = process.waitFor();
             if (exitCode != 0) {
-                throw new VcsException("Diversion command failed with exit code " + exitCode +
+                if (exitCode != 101 && !args[0].equals("clone")) {
+                    throw new VcsException("Diversion command failed with exit code " + exitCode +
                     "\nOutput: " + output.toString());
+                }
+                else {
+                    logger.message("Diversion: clone exited but sync still in progress");
+                }
             }
 
         } catch (Exception e) {

@@ -166,6 +166,8 @@ public class DiversionCommandExecutor {
      */
     public void cloneRepository(@NotNull String repoId, @NotNull File targetPath) throws VcsException {
         execute("clone", repoId, targetPath.getAbsolutePath(), "--new-workspace");
+        // dv clone will exit while the repo is still syncing for a large repo. Block on dv status to finish
+        execute("status");
     }
 
     /**
