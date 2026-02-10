@@ -214,6 +214,20 @@ public class DiversionCommandExecutor {
     }
 
     /**
+     * Ensure workspace is resumed
+     *
+     * @throws VcsException if resume fails
+     */
+    public void resumeWorkspace() throws VcsException {
+        try {
+            execute("workspace", "resume");
+        } catch (VcsException e)
+        {
+            // safe to fail
+        }
+    }
+
+    /**
      * Get the list of files for a commit with their status
      * Uses 'dv ls <commitId> <filename>' which outputs JSON to a file
      *
@@ -269,6 +283,7 @@ public class DiversionCommandExecutor {
      */
     public void ensureWorkspaceInitialized(@NotNull String repoId) throws VcsException {
         if (isWorkspaceInitialized()) {
+            resumeWorkspace();
             return; // Already initialized
         }
 

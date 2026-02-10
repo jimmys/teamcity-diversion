@@ -93,6 +93,18 @@ public class DiversionAgentVcsSupport extends AgentVcsSupport implements UpdateB
             // Clean checkout explicitly requested
             logger.message("Diversion: Clean checkout requested - removing existing workspace");
 
+            // Delete old workspace if it exists
+            if (workspaceExists) {
+                logger.message("Diversion: deleteing old workspace");
+                // in my testing, diversion does not like to delete a paused workspace
+                try {
+                    runDvCommand(checkoutDirectory, logger, "workspace", "resume");
+                    runDvCommand(checkoutDirectory, logger, "status");
+                    runDvCommand(checkoutDirectory, logger, "workspace", "delete");
+                } catch (VcsException e) {
+                    // these commands are safe to fail
+                }
+            }
             // Clean directory if it exists
             if (checkoutDirectory.exists()) {
                 logger.message("Diversion: Cleaning existing directory");
@@ -136,6 +148,9 @@ public class DiversionAgentVcsSupport extends AgentVcsSupport implements UpdateB
         } else {
             // Incremental update - workspace already exists
             logger.message("Diversion: Incremental update - reusing existing workspace");
+
+            // ensure workspace is resumed
+            runDvCommand(checkoutDirectory, logger, "workspace", "resume");
         }
 
         // Checkout specific commit
@@ -211,12 +226,14 @@ public class DiversionAgentVcsSupport extends AgentVcsSupport implements UpdateB
 
             int exitCode = process.waitFor();
             if (exitCode != 0) {
-                if (exitCode != 101 && !args[0].equals("clone")) {
+                if (exitCode == 101 && args[0].equals("clone")) {
+                    logger.message("Diversion: clone exited but sync still in progress");
+                } else if (exitCode == 3 && args[0].equals("workspace") && args[1].equals("resume")) {
+                    logger.message("Diversion: workspace resume exited because workspace was not paused");
+                }
+                else  {
                     throw new VcsException("Diversion command failed with exit code " + exitCode +
                     "\nOutput: " + output.toString());
-                }
-                else {
-                    logger.message("Diversion: clone exited but sync still in progress");
                 }
             }
 
