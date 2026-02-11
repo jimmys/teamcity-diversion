@@ -189,6 +189,8 @@ public class DiversionCommandExecutor {
                 return; // Success
             } catch (VcsException e) {
                 if (e.getMessage().contains("Sync is incomplete") && attempt < DiversionSettings.MAX_CHECKOUT_RETRIES) {
+                    // dv clone will exit while the repo is still syncing for a large repo. Block on dv status to finish
+                    execute("status");
                     try {
                         Thread.sleep(DiversionSettings.CHECKOUT_RETRY_DELAY_MS);
                     } catch (InterruptedException ie) {

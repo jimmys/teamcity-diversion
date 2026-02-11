@@ -226,8 +226,10 @@ public class DiversionAgentVcsSupport extends AgentVcsSupport implements UpdateB
 
             int exitCode = process.waitFor();
             if (exitCode != 0) {
-                if (exitCode == 101 && args[0].equals("clone")) {
-                    logger.message("Diversion: clone exited but sync still in progress");
+                if (exitCode == 101 && 
+                    (args[0].equals("clone") ||
+                    args[0].equals("checkout"))) {
+                    logger.message("Diversion: clone or checkout exited but sync still in progress");
                 } else if (exitCode == 3 && args[0].equals("workspace") && args[1].equals("resume")) {
                     logger.message("Diversion: workspace resume exited because workspace was not paused");
                 }
