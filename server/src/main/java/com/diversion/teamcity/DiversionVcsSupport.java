@@ -327,7 +327,7 @@ public class DiversionVcsSupport extends ServerVcsSupport implements BuildPatchB
     public String getVersionDisplayName(@NotNull String version, @NotNull VcsRoot root) throws VcsException {
         // Display commit number and version
         int commitNum = DiversionLogParser.extractCommitNumber(version);
-        return "Commit #" + commitNum + " (" + version + ")";
+        return version;
     }
 
     @NotNull
